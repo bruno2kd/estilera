@@ -5,6 +5,7 @@ import Register from '@/components/Register';
 import Login from '@/components/Login';
 import CreateSeller from '@/components/CreateSeller';
 import UpdateSeller from '@/components/UpdateSeller';
+import CreateProduct from '@/components/CreateProduct';
 
 Vue.use(Router);
 
@@ -35,6 +36,11 @@ export default new Router({
       path: '/users/updateSeller',
       name: 'UpdateSeller',
       component: UpdateSeller,
+    },
+    {
+      path: '/products/add',
+      name: 'CreateProduct',
+      component: CreateProduct,
     },
   ],
 });
