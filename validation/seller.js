@@ -5,10 +5,14 @@ module.exports = function validateSellerInput(data) {
   let errors = {};
 
   data.handle = !isEmpty(data.handle) ? data.handle : '';
-  data.status = !isEmpty(data.status) ? data.status : '';
+  data.name = !isEmpty(data.name) ? data.name : '';
 
   if (!Validator.isLength(data.handle, { min: 2, max: 30 })) {
     errors.handle = 'Handle must be between 2 and 30 characters';
+  }
+
+  if (Validator.isEmpty(data.name)) {
+    errors.name = 'Name field is required';
   }
 
   if (!isEmpty(data.website)) {

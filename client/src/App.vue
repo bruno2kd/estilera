@@ -8,12 +8,14 @@
     >
       <v-list dense>
         <v-list-tile>
-          <v-list-tile-action>
-            <v-icon>dashboard</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Dashboard</v-list-tile-title>
-          </v-list-tile-content>
+            <v-list-tile-action>
+              <v-icon>dashboard</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <router-link :to="{ name: 'Home' }">
+                <v-list-tile-title>Dashboard</v-list-tile-title>
+              </router-link>
+            </v-list-tile-content>
         </v-list-tile>
         <v-list-tile>
           <v-list-tile-action>
@@ -21,6 +23,16 @@
           </v-list-tile-action>
           <v-list-tile-content>
             <v-list-tile-title>Settings</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-action>
+            <v-icon>settings</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <router-link :to="{ name: 'CreateSeller' }">
+                <v-list-tile-title>Create Seller</v-list-tile-title>
+              </router-link>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -56,7 +68,11 @@ export default {
 </script>
 
 <style scoped>
-li a {
+a {
   text-decoration: none;
+}
+.v-list__tile__title {
+  text-decoration: none;
+  color: #fff;
 }
 </style>

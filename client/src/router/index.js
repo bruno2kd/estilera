@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Home from '@/components/Home';
 import Register from '@/components/Register';
 import Login from '@/components/Login';
+import CreateSeller from '@/components/CreateSeller';
 
 Vue.use(Router);
 
@@ -23,6 +24,11 @@ export default new Router({
       path: '/users/login',
       name: 'Login',
       component: Login,
+    },
+    {
+      path: '/users/createSeller',
+      name: 'CreateSeller',
+      component: CreateSeller,
     },
   ],
 });

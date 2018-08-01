@@ -86,7 +86,7 @@ router.get('/user/:user_id', (req, res) => {
     .catch(err => res.status(404).json(err));
 });
 
-// @route       POST api/seller
+// @route       POST api/sellers
 // @desc        Create current users seller profile
 // @access      Private
 router.post(
@@ -94,19 +94,17 @@ router.post(
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
     console.log('Passou 1');
+    console.log(req.body);
     const { errors, isValid } = validateSellerInput(req.body);
-    console.log('Passou 2');
     if (!isValid) {
       return res.status(400).json(errors);
     }
-    console.log('Passou 3');
-    // console.log("AQUI AAAAAAA");
-    // console.log(req.body);
+    console.log('Passou 2');
     // Get filds
     const sellerFields = {};
     sellerFields.user = req.user.id;
+    sellerFields.name = req.body.name;
     sellerFields.handle = req.body.handle;
-    sellerFields.company = req.body.company;
     sellerFields.website = req.body.website;
     sellerFields.location = req.body.location;
     // Social stuff
@@ -116,8 +114,6 @@ router.post(
     sellerFields.social.facebook = req.body.facebook;
     sellerFields.social.instagram = req.body.instagram;
 
-    console.log('Passou 4');
-
     Seller.findOne({ user: req.user.id }).then(seller => {
       if (seller) {
         //update
@@ -125,18 +121,20 @@ router.post(
         errors.message = 'User already has a seller';
         res.status(400).json(errors);
       } else {
-        // create
-        // Check if handle exists
-        Seller.findOne({ handle: sellerFields.handle }).then(seller => {
-          if (seller) {
-            // errors.handle = 'That handle already exists';
-            errors.message = 'That handle already exists';
-            res.status(400).json(errors);
-          }
-          // Save Seller Profile
-          new Seller(sellerFields).save().then(seller => res.json(seller));
-        });
+        // Para fins de desenvolvimento vou deixar
+        // o mesmo usuario ter mais de uma marca
       }
+      // create
+      // Check if handle exists
+      Seller.findOne({ handle: sellerFields.handle }).then(seller => {
+        if (seller) {
+          // errors.handle = 'That handle already exists';
+          errors.message = 'That handle already exists';
+          res.status(400).json(errors);
+        }
+        // Save Seller Profile
+        new Seller(sellerFields).save().then(seller => res.json(seller));
+      });
     });
   },
 );
