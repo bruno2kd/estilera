@@ -2,11 +2,22 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
 import Vuetify from 'vuetify';
+import axios from 'axios';
 
 import App from './App';
 import router from './router';
+import setAuthToken from './utils/setAuthToken';
 
 Vue.use(Vuetify);
+
+axios.defaults.baseURL = 'http://localhost:8000/api';
+// Check for token
+if (localStorage.jwtToken) {
+  // Set auth token header auth
+
+  setAuthToken(localStorage.jwtToken);
+  // Decode token to get user info and exp
+}
 
 Vue.config.productionTip = false;
 

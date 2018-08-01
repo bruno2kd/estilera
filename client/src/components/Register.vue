@@ -152,7 +152,7 @@ export default {
               password: this.password,
               password2: this.password2,
             },
-            url: 'http://localhost:8000/api/users/register',
+            url: '/users/register',
           });
           console.log(res);
           this.$router.push('/');

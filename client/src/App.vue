@@ -65,7 +65,6 @@
 
 <script>
 import appFooter from '@/components/Footer';
-import setAuthToken from './utils/setAuthToken';
 
 export default {
   name: 'App',
@@ -74,15 +73,6 @@ export default {
   }),
   components: {
     appFooter,
-  },
-  beforeCreate() {
-    // Check for token
-    if (localStorage.jwtToken) {
-      // Set auth token header auth
-
-      setAuthToken(localStorage.jwtToken);
-      // Decode token to get user info and exp
-    }
   },
 };
 </script>

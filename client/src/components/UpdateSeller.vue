@@ -110,9 +110,9 @@ export default {
     async createSellerProfile() {
       // const token = window.localStorage.getItem('auth');
       try {
-        const urlGetSeller = 'http://localhost:8000/api/sellers';
+        const urlGetSeller = '/sellers';
         const seller = await axios.get(urlGetSeller);
-        const url = `http://localhost:8000/api/sellers/${seller.data._id}`;
+        const url = `/sellers/${seller.data._id}`;
         const res = await axios.put(url, {
           name: this.name,
           handle: this.handle,
@@ -127,7 +127,7 @@ export default {
     },
     async fetchSellerProfile() {
       try {
-        const urlGetSeller = 'http://localhost:8000/api/sellers';
+        const urlGetSeller = '/sellers';
         const seller = await axios.get(urlGetSeller);
         console.log(seller);
         this.name = seller.data.name;

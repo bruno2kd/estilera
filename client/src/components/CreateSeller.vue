@@ -117,7 +117,7 @@ export default {
     async createSellerProfile() {
       // const token = window.localStorage.getItem('auth');
       try {
-        const url = 'http://localhost:8000/api/sellers';
+        const url = '/sellers';
         const res = await axios.post(url, {
           name: this.name,
           handle: this.handle,

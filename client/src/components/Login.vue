@@ -104,13 +104,10 @@ export default {
     async login() {
       if (this.form) {
         try {
-          const res = await axios.post(
-            'http://localhost:8000/api/users/login',
-            {
-              email: this.email,
-              password: this.password,
-            },
-          );
+          const res = await axios.post('/users/login', {
+            email: this.email,
+            password: this.password,
+          });
           console.log(res);
           const { token } = res.data;
           // Set token to Local storage
