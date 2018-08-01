@@ -27,8 +27,12 @@
     </v-navigation-drawer>
     <v-toolbar app fixed clipped-left>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title>Application</v-toolbar-title>
+      <v-toolbar-title>
+        <router-link :to="{ name: 'Home' }">Application</router-link>
+      </v-toolbar-title>
+      <v-spacer></v-spacer>
       <router-link :to="{ name: 'Register' }">Register</router-link>
+      <router-link :to="{ name: 'Login' }"> Login</router-link>
     </v-toolbar>
     <v-content>
       <router-view/>
@@ -50,3 +54,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+li a {
+  text-decoration: none;
+}
+</style>
