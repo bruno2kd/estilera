@@ -35,6 +35,7 @@ module.exports = {
     'no-console': 0,
     'dot-notation': 0,
     'arrow-parens': 0,
+    'no-underscore-dangle': 0,
     // disallow reassignment of function parameters
     // disallow parameter object manipulation except for specific exclusions
     'no-param-reassign': [

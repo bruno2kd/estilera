@@ -27,7 +27,7 @@
       <v-btn icon>
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
-      <v-card-title class="title font-weight-regular">Create Seller</v-card-title>
+      <v-card-title class="title font-weight-regular">Update Seller</v-card-title>
       <v-spacer></v-spacer>
       <v-btn icon>
         <v-icon>mdi-magnify</v-icon>
@@ -103,13 +103,6 @@ export default {
     isLoading: false,
     errorForm: undefined,
     rules: {
-      // website: v =>
-      // ^[a-z][a-z\d.+-]*:\/*(?:[^:@]+(?::[^@]+)?@)?(?:[^\s:/?#]+|\[[a-f\d:]+])
-      // (?::\d+)?(?:\/[^?#]*)?(?:\?[^#]*)?(?:#.*)?$/i.test(
-      //     v,
-      //   ) || 'Website must be valid',
-      // (v || '').match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).+$/) ||
-      // 'Password must contain an upper case letter, a numeric character, and a special character',
       required: v => !!v || 'This field is required',
     },
   }),
@@ -117,8 +110,10 @@ export default {
     async createSellerProfile() {
       // const token = window.localStorage.getItem('auth');
       try {
-        const url = 'http://localhost:8000/api/sellers';
-        const res = await axios.post(url, {
+        const urlGetSeller = 'http://localhost:8000/api/sellers';
+        const seller = await axios.get(urlGetSeller);
+        const url = `http://localhost:8000/api/sellers/${seller.data._id}`;
+        const res = await axios.put(url, {
           name: this.name,
           handle: this.handle,
           website: this.website,
@@ -130,6 +125,22 @@ export default {
         this.errorForm = error.response.data.message;
       }
     },
+    async fetchSellerProfile() {
+      try {
+        const urlGetSeller = 'http://localhost:8000/api/sellers';
+        const seller = await axios.get(urlGetSeller);
+        console.log(seller);
+        this.name = seller.data.name;
+        this.handle = seller.data.handle;
+        this.website = seller.data.website;
+        this.location = seller.data.location;
+      } catch (error) {
+        console.log(error.response.data);
+      }
+    },
+  },
+  mounted() {
+    this.fetchSellerProfile();
   },
 };
 </script>

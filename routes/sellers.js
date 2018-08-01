@@ -9,12 +9,12 @@ const User = require('../models/User');
 // Load Input Validation
 const validateSellerInput = require('../validation/seller');
 
-// @route       GET api/seller/test
+// @route       GET api/sellers/test
 // @desc        test seller route
 // @access      Public
 router.get('/test', (req, res) => res.json({ msg: 'Seller Works' }));
 
-// @route       GET api/seller
+// @route       GET api/sellers
 // @desc        Get current users seller
 // @access      Private
 router.get(
@@ -29,7 +29,7 @@ router.get(
           errors.message = 'There is no seller profile for this user';
           return res.status(404).json(errors);
         }
-        return res.json(profile);
+        return res.json(seller);
       })
       .catch(err => res.status(404).json(err));
   },
@@ -70,21 +70,25 @@ router.get('/handle/:handle', (req, res) => {
 });
 
 // @route       GET api/sellers/user/:user_id
-// @desc        Get profile by user_id
-// @access      Public
-router.get('/user/:user_id', (req, res) => {
-  const errors = {};
-  Profile.findOne({ user: req.params.user_id })
-    .populate('user', ['name', 'avatar'])
-    .then(profile => {
-      if (!profile) {
-        errors.noprofile = 'There is no profile for this user';
-        return res.status(404).json(errors);
-      }
-      res.json(profile);
-    })
-    .catch(err => res.status(404).json(err));
-});
+// @desc        Get seller profile by user_id
+// @access      Private
+router.get(
+  '/user/:user_id',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    const errors = {};
+    Seller.findOne({ user: req.params.user_id })
+      .populate('user', ['name'])
+      .then(seller => {
+        if (!seller) {
+          errors.message = 'There is no profile for this user';
+          return res.status(404).json(errors);
+        }
+        return res.json(seller);
+      })
+      .catch(err => res.status(404).json(err));
+  },
+);
 
 // @route       POST api/sellers
 // @desc        Create current users seller profile
@@ -93,21 +97,13 @@ router.post(
   '/',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
-    console.log('Passou 1');
-    console.log(req.body);
     const { errors, isValid } = validateSellerInput(req.body);
     if (!isValid) {
       return res.status(400).json(errors);
     }
-    console.log('Passou 2');
-    // Get filds
-    const sellerFields = {};
+    // Get fields
+    const sellerFields = { ...req.body };
     sellerFields.user = req.user.id;
-    sellerFields.name = req.body.name;
-    sellerFields.handle = req.body.handle;
-    sellerFields.website = req.body.website;
-    sellerFields.location = req.body.location;
-    // Social stuff
     sellerFields.social = {};
     sellerFields.social.youtube = req.body.youtube;
     sellerFields.social.twitter = req.body.twitter;
@@ -119,23 +115,62 @@ router.post(
         //update
         // handle user that already has a seller
         errors.message = 'User already has a seller';
-        res.status(400).json(errors);
+        return res.status(400).json(errors);
       } else {
         // Para fins de desenvolvimento vou deixar
         // o mesmo usuario ter mais de uma marca
+        // create
+        // Check if handle exists
+        Seller.findOne({ handle: sellerFields.handle }).then(seller => {
+          if (seller) {
+            // errors.handle = 'That handle already exists';
+            errors.message = 'That handle already exists';
+            return res.status(400).json(errors);
+          }
+          // Save Seller Profile
+          new Seller(sellerFields).save().then(seller => res.json(seller));
+        });
       }
-      // create
-      // Check if handle exists
-      Seller.findOne({ handle: sellerFields.handle }).then(seller => {
+    });
+  },
+);
+
+// @route       PUT api/profile
+// @desc        Update current users seller profile
+// @access      Private
+router.put(
+  '/:seller_id',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const { errors, isValid } = validateSellerInput(req.body);
+
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
+    // Get fields
+    const sellerFields = { ...req.body };
+    sellerFields.user = req.user.id;
+    sellerFields.social = {};
+    sellerFields.social.youtube = req.body.youtube;
+    sellerFields.social.twitter = req.body.twitter;
+    sellerFields.social.facebook = req.body.facebook;
+    sellerFields.social.instagram = req.body.instagram;
+
+    Seller.findOne({ user: req.user.id, _id: req.params.seller_id }).then(
+      seller => {
         if (seller) {
-          // errors.handle = 'That handle already exists';
-          errors.message = 'That handle already exists';
+          //update
+          Seller.findOneAndUpdate(
+            { user: req.user.id },
+            { $set: sellerFields },
+            { new: true },
+          ).then(seller => res.json(seller));
+        } else {
+          errors.message = 'There is no Seller Profile for this user';
           res.status(400).json(errors);
         }
-        // Save Seller Profile
-        new Seller(sellerFields).save().then(seller => res.json(seller));
-      });
-    });
+      },
+    );
   },
 );
 

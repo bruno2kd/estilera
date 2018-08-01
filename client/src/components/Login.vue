@@ -121,7 +121,7 @@ export default {
           // const decoded = jwt_decode(token);
           // Set current user in app state
           // dispatch(setCurrentUser(decoded));
-          // this.$router.push('/');
+          this.$router.push('/');
         } catch (error) {
           console.log(error.response.data.message);
           this.errorForm = error.response.data.message;

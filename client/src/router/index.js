@@ -4,6 +4,7 @@ import Home from '@/components/Home';
 import Register from '@/components/Register';
 import Login from '@/components/Login';
 import CreateSeller from '@/components/CreateSeller';
+import UpdateSeller from '@/components/UpdateSeller';
 
 Vue.use(Router);
 
@@ -29,6 +30,11 @@ export default new Router({
       path: '/users/createSeller',
       name: 'CreateSeller',
       component: CreateSeller,
+    },
+    {
+      path: '/users/updateSeller',
+      name: 'UpdateSeller',
+      component: UpdateSeller,
     },
   ],
 });

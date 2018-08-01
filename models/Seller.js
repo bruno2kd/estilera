@@ -8,6 +8,11 @@ const SellerSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'users',
     },
+    name: {
+      type: String,
+      required: true,
+      max: 30,
+    },
     // handle eh tipo um slug
     handle: {
       type: String,
