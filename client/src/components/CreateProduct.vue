@@ -1,4 +1,5 @@
 <template>
+<div>
   <v-card
     class="mx-auto"
     style="max-width: 500px;"
@@ -50,6 +51,16 @@
         label="Product Name"
         type="text"
       ></v-text-field>
+      <input
+      style="display: none"
+      id="imageFileSelec"
+      type="file"
+      :name="selectedFile"
+      @change="onFileSelected"
+      ref="fileInput"
+      >
+      <button @click.prevent="$refs.fileInput.click()" >Pick File</button>
+      <h6>{{fileName}}</h6>
       <p v-if="errorForm">{{errorForm}}</p>
     </v-form>
     <v-divider></v-divider>
@@ -65,6 +76,11 @@
       >Submit</v-btn>
     </v-card-actions>
   </v-card>
+  <div id="preview">
+    <button @click="saiImagem">BOTAO</button>
+    <img v-if="imageUrl" :src="imageUrl" height="250px" width="250px"/>
+  </div>
+  </div>
 </template>
 
 <script>
@@ -76,6 +92,9 @@ export default {
     form: false,
     isLoading: false,
     errorForm: undefined,
+    selectedFile: undefined,
+    fileName: undefined,
+    imageUrl: undefined,
     rules: {
       required: v => !!v || 'This field is required',
     },
@@ -83,11 +102,18 @@ export default {
   methods: {
     async createProduct() {
       try {
-        const user = await axios.get('/users/current');
+        const seller = await axios.get('/sellers');
+        const fd = new FormData();
+        fd.append('productImage', this.selectedFile, seller.data._id);
+        fd.append('name', this.name);
+        fd.append('seller', seller.data._id);
         const url = '/products';
-        const res = await axios.post(url, {
-          name: this.name,
-          user: user._id,
+        const res = await axios.post(url, fd, {
+          onUploadProgress: uploadEvent => {
+            const up = uploadEvent.loaded / uploadEvent.total;
+            // eslint-disable-next-line
+            console.log('Upload Progress: ', Math.round(up * 100) + '%');
+          },
         });
         console.log(res);
       } catch (error) {
@@ -95,6 +121,27 @@ export default {
         this.errorForm = error.response.data.message;
       }
     },
+    onFileSelected(e) {
+      console.log(e);
+      const ft = e.target.files[0].type;
+      console.log(ft);
+      if (ft === 'image/png' || ft === 'image/jpg' || ft === 'image/jpeg') {
+        console.log(ft);
+        this.selectedFile = e.target.files[0];
+        this.imageUrl = URL.createObjectURL(this.selectedFile);
+        this.fileName = e.target.files[0].name;
+      } else {
+        this.errorForm = 'Imagem must be .png .jpg or .jpeg';
+        this.saiImagem();
+      }
+    },
+    saiImagem() {
+      document.getElementById('imageFileSelec').value = '';
+      this.selectedFile = undefined;
+      this.imageUrl = undefined;
+    },
   },
 };
 </script>
+<style scoped>
+</style>

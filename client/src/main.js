@@ -4,6 +4,7 @@ import Vue from 'vue';
 import Vuetify from 'vuetify';
 import axios from 'axios';
 
+import { store } from './store/store';
 import App from './App';
 import router from './router';
 import setAuthToken from './utils/setAuthToken';
@@ -24,6 +25,7 @@ Vue.config.productionTip = false;
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
+  store,
   router,
   components: { App },
   template: '<App/>',

@@ -1,5 +1,37 @@
 const express = require('express');
 const passport = require('passport');
+const multer = require('multer');
+const uniqid = require('uniqid');
+
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, './uploads/');
+  },
+  filename: function(req, file, cb) {
+    cb(null, uniqid() + file.originalname + '.png');
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/jpeg'
+  ) {
+    cb(null, true);
+  } else {
+    //reject a file
+    cb(null, false);
+  }
+};
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 1024 * 1024 * 5,
+  },
+  fileFilter,
+});
 
 const router = express.Router();
 
@@ -28,32 +60,29 @@ router.get('/', (req, res) => {
 });
 
 // @route       POST api/products/
-// @desc        create new product
+// @desc        Create New product
 // @access      Private
 router.post(
   '/',
   passport.authenticate('jwt', { session: false }),
+  upload.array('productImage', 6),
   async (req, res) => {
-    console.log('Passou 1');
     const { errors, isValid } = validateProductInput(req.body);
     // Check Validation
     if (!isValid) {
       return res.status(400).json(errors);
     }
     try {
-      console.log('Passou 2');
-      const seller = await Seller.findOne({ user: req.user });
-      console.log(seller);
-
-      console.log('Passou 3');
+      // const seller = await Seller.findOne({ user: req.user });
       const newProduct = new Product({
         name: req.body.name,
-        seller: seller.id,
+        seller: req.body.seller,
+        productImage: req.files.map(x => x.path),
       });
-      console.log('Passou 4');
-
-      newProduct.save().then(product => res.json(product));
+      const product = await newProduct.save();
+      return res.json(product);
     } catch (error) {
+      console.log(error.message);
       return res.status(400).json('Something went wrong');
     }
   },
