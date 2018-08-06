@@ -52,6 +52,7 @@
         type="text"
       ></v-text-field>
       <input
+      multiple
       style="display: none"
       id="imageFileSelec"
       type="file"
@@ -60,7 +61,9 @@
       ref="fileInput"
       >
       <button @click.prevent="$refs.fileInput.click()" >Pick File</button>
-      <h6>{{fileName}}</h6>
+      <div v-if="images" v-for="image in images" :key="image.fileName" >
+        <h6>{{image.fileName}}</h6>
+      </div>
       <p v-if="errorForm">{{errorForm}}</p>
     </v-form>
     <v-divider></v-divider>
@@ -77,8 +80,10 @@
     </v-card-actions>
   </v-card>
   <div id="preview">
-    <button @click="saiImagem">BOTAO</button>
-    <img v-if="imageUrl" :src="imageUrl" height="250px" width="250px"/>
+    <div v-if="images" v-for="(image, i) in images" :key="i" >
+      <button @click="rmvImageByIndex(i)">BOTAO</button>
+      <img :src="image.imageUrl" height="250px" width="250px"/>
+    </div>
   </div>
   </div>
 </template>
@@ -93,20 +98,30 @@ export default {
     isLoading: false,
     errorForm: undefined,
     selectedFile: undefined,
-    fileName: undefined,
-    imageUrl: undefined,
+    // fileName: undefined,
+    // imageUrl: undefined,
+    images: [],
     rules: {
       required: v => !!v || 'This field is required',
     },
   }),
+  watch: {
+    // eslint-disable-next-line
+    images: function() {
+      console.log(this.images);
+    },
+  },
   methods: {
     async createProduct() {
       try {
         const seller = await axios.get('/sellers');
         const fd = new FormData();
-        fd.append('productImage', this.selectedFile, seller.data._id);
         fd.append('name', this.name);
         fd.append('seller', seller.data._id);
+        this.images.forEach(x => {
+          fd.append('productImage', x.selectedFile, seller.data._id);
+        });
+        console.log(fd);
         const url = '/products';
         const res = await axios.post(url, fd, {
           onUploadProgress: uploadEvent => {
@@ -115,6 +130,8 @@ export default {
             console.log('Upload Progress: ', Math.round(up * 100) + '%');
           },
         });
+        this.images = [];
+        this.name = undefined;
         console.log(res);
       } catch (error) {
         console.log(error.response.data);
@@ -122,23 +139,31 @@ export default {
       }
     },
     onFileSelected(e) {
-      console.log(e);
-      const ft = e.target.files[0].type;
-      console.log(ft);
-      if (ft === 'image/png' || ft === 'image/jpg' || ft === 'image/jpeg') {
-        console.log(ft);
-        this.selectedFile = e.target.files[0];
-        this.imageUrl = URL.createObjectURL(this.selectedFile);
-        this.fileName = e.target.files[0].name;
-      } else {
-        this.errorForm = 'Imagem must be .png .jpg or .jpeg';
-        this.saiImagem();
+      this.errorForm = '';
+      if (e.target.files.length > 6) {
+        this.errorForm = 'Maximo de 6 imagens';
+        return;
       }
+      const notValid = Object.values(e.target.files).filter(
+        x =>
+          x.type !== 'image/png' &&
+          x.type !== 'image/jpg' &&
+          x.type !== 'image/jpeg',
+      );
+      if (notValid.length > 0) {
+        this.errorForm = 'Images must be .png .jpg or .jpeg';
+        return;
+      }
+      Object.values(e.target.files).forEach(x => {
+        this.images.push({
+          selectedFile: x,
+          imageUrl: URL.createObjectURL(x),
+          fileName: x.name,
+        });
+      });
     },
-    saiImagem() {
-      document.getElementById('imageFileSelec').value = '';
-      this.selectedFile = undefined;
-      this.imageUrl = undefined;
+    rmvImageByIndex(index) {
+      this.images.splice(index, 1);
     },
   },
 };
