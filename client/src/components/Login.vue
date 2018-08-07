@@ -79,9 +79,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+// import axios from 'axios';
 // import jwt_decode from 'jwt-decode';
-import setAuthToken from '../utils/setAuthToken';
 
 export default {
   data: () => ({
@@ -101,28 +100,13 @@ export default {
     },
   }),
   methods: {
-    async login() {
+    login() {
       if (this.form) {
-        try {
-          const res = await axios.post('/users/login', {
-            email: this.email,
-            password: this.password,
-          });
-          console.log(res);
-          const { token } = res.data;
-          // Set token to Local storage
-          localStorage.setItem('jwtToken', token);
-          // Set token to Auth header
-          setAuthToken(token);
-          // Decote token with jwt_decode
-          // const decoded = jwt_decode(token);
-          // Set current user in app state
-          // dispatch(setCurrentUser(decoded));
-          this.$router.push('/');
-        } catch (error) {
-          console.log(error.response.data.message);
-          this.errorForm = error.response.data.message;
-        }
+        this.$store.dispatch('storeLogin', {
+          email: this.email,
+          password: this.password,
+        });
+        this.$router.push({ name: 'Home' });
       }
     },
   },

@@ -88,14 +88,18 @@ router.post('/login', (req, res) => {
             id: user.id,
             name: user.name,
             email: user.email,
-            avatar: user.avatar,
           };
 
           // Sign Token
-          jwt.sign(payload, secretKey, { expiresIn: oneWeek }, (err, token) => {
+          jwt.sign(payload, secretKey, { expiresIn: '7d' }, (err, token) => {
             res.json({
               success: true,
-              token: 'Bearer ' + token,
+              token: token,
+              userId: user._id,
+              user: {
+                name: user.name,
+                email: user.email,
+              },
             });
           });
         } else {

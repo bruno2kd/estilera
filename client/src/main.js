@@ -18,6 +18,7 @@ if (localStorage.jwtToken) {
 
   setAuthToken(localStorage.jwtToken);
   // Decode token to get user info and exp
+  store.dispatch('tryAutoLogin');
 }
 
 Vue.config.productionTip = false;

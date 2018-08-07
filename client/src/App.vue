@@ -63,8 +63,13 @@
         <router-link :to="{ name: 'Home' }">Application</router-link>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <router-link :to="{ name: 'Register' }">Register</router-link>
-      <router-link :to="{ name: 'Login' }"> Login</router-link>
+      <div v-if="!auth" >
+        <router-link :to="{ name: 'Register' }">Register</router-link>
+        <router-link :to="{ name: 'Login' }"> Login</router-link>
+      </div>
+      <div v-if="auth" >
+        <a @click="onLogout">Logout</a>
+      </div>
     </v-toolbar>
     <v-content>
       <router-view/>
@@ -83,6 +88,17 @@ export default {
   }),
   components: {
     appFooter,
+  },
+  computed: {
+    auth() {
+      return this.$store.getters.isAuthenticated;
+    },
+  },
+  methods: {
+    onLogout() {
+      this.$store.dispatch('logout');
+      this.$router.push({ name: 'Login' });
+    },
   },
 };
 </script>
